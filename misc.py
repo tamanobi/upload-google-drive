@@ -14,11 +14,14 @@ class AppDrive:
     app_name = None
     app_root_id = None
     service = None
+    slack = None
 
-    def __init__(self, name, client_secrets_raw):
+
+    def __init__(self, name, client_secrets_raw, slack=None):
         self.app_name = name
         self.service = self.get_service(client_secrets_raw)
         self.root_id = self.get_root_id()
+        self.slack = slack
         if self.root_id is None:
             self.root_id = self.mkdir(self.app_name)
 
@@ -95,9 +98,25 @@ class AppDrive:
     def upload_medium_from_directory(self, dir_path):
         png = [str(p) for p in Path(dir_path).glob('*.png')]
         jpg = [str(p) for p in Path(dir_path).glob('*.jpg')]
-        for file_path in (png + jpg):
-            print("uploading: " + file_path)
+        total = len(png) + len(jpg)
+        for i, file_path in enumerate(png + jpg):
+            txt = f"{i}/{total}: uploading: {file_path}"
+            print(txt)
+            if self.slack is not None:
+                try:
+                    self.slack.notify(text=txt)
+                except:
+                    pass
+
             self.upload_media(media_path=file_path)
+
+            txt = f"{i}/{total}: done: {file_path}"
+            print(txt)
+            if self.slack is not None:
+                try:
+                    self.slack.notify(text=txt)
+                except:
+                    pass
 
     def upload_media_many(self, medium):
         batch = self.service.new_batch_http_request(callback=self.callback)

@@ -6,10 +6,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from misc import AppDrive
 import os
+import slackweb
 
 def main():
     client_secrets_raw = os.getenv('GOOGLE_CLIENT_SECRETS', '')
-    drive = AppDrive("gazo-collection", client_secrets_raw)
+    if os.getenv('SLACK'):
+        slack = slackweb.Slack(url=os.getenv('SLACK'))
+
+    drive = AppDrive("gazo-collection", client_secrets_raw, slack)
 
     path = os.getenv('UPLOAD_DIR')
     if path is not None:
