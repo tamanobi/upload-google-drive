@@ -80,6 +80,7 @@ class AppDrive:
             'name' : name,
             "parents": [parent_id],
             "description": description,
+            "spaces": ["photos"],
         }
         return self.service.files().create(body=metadata, media_body=media_path)
 
