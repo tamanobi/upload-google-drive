@@ -10,6 +10,7 @@ import slackweb
 
 def main():
     client_secrets_raw = os.getenv('GOOGLE_CLIENT_SECRETS', '')
+    slack = None
     if os.getenv('SLACK'):
         slack = slackweb.Slack(url=os.getenv('SLACK'))
 
